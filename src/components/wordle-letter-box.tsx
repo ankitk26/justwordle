@@ -1,4 +1,5 @@
 import type { ChangeEvent } from "react";
+import { MAX_TRIES } from "~/lib/constants";
 import { cn } from "~/lib/utils";
 import { useGameStore } from "~/stores/game-store";
 import type { GridRow } from "~/types";
@@ -28,6 +29,7 @@ export default function WordleLetterBox({
 
   const updateGridCell = useGameStore((store) => store.updateGridCell);
   const winGame = useGameStore((store) => store.winGame);
+  const loseGame = useGameStore((store) => store.loseGame);
   const lockGridRow = useGameStore((store) => store.lockGridRow);
 
   const handleCharacterChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -121,6 +123,14 @@ export default function WordleLetterBox({
 
         // if not solved, lock the current row to avoid editing the previous attempts
         lockGridRow(rowIndex);
+
+        // check if it is the last row
+        // at this point, the game is lost
+        if (rowIndex === MAX_TRIES - 1) {
+          loseGame();
+          return;
+        }
+
         // go to next row
         document.getElementById(nextRowFirstBoxId)?.focus();
       }}
