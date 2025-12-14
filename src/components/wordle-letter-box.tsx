@@ -27,6 +27,13 @@ export default function WordleLetterBox({
   const nextBoxId = getBoxId(rowIndex, columnIndex + 1);
   const nextRowFirstBoxId = getBoxId(rowIndex + 1, 0);
 
+  const wordCharacterFrequency = new Array<number>(26).fill(0);
+  const submittedWord = row.row.join("");
+
+  for (const character of word) {
+    wordCharacterFrequency[getCharacterIndex(character)] += 1;
+  }
+
   const updateGridCell = useGameStore((store) => store.updateGridCell);
   const winGame = useGameStore((store) => store.winGame);
   const loseGame = useGameStore((store) => store.loseGame);
@@ -62,34 +69,48 @@ export default function WordleLetterBox({
     document.getElementById(nextBoxId)?.focus();
   }
 
+  function getCharacterIndex(character: string) {
+    const characterAsciiCode = character.charCodeAt(0);
+    return characterAsciiCode - 65;
+  }
+
   function getBoxBackground() {
+    const correctColor = "bg-emerald-200 dark:bg-emerald-600";
+    const incorrectColor = "bg-neutral-300 dark:bg-neutral-600";
+    const partiallyCorrectColor = "bg-amber-200 dark:bg-amber-600";
+
     if (!row.isSubmitted || row.row[columnIndex] === "") {
       return "";
     }
-    if (row.row[columnIndex] === word[columnIndex]) {
-      return "bg-emerald-200 dark:bg-emerald-600";
-    }
-    if (word.includes(row.row[columnIndex])) {
-      return "bg-amber-200 dark:bg-amber-600";
-    }
-    return "bg-neutral-300 dark:bg-neutral-600";
-  }
 
-  function decideWinOrLoss() {
-    let hasSolved = true;
-
-    // validate if word entered matches the game's word
-    for (let i = 0; i < word.length; i++) {
-      if (row.row[i] !== word[i]) {
-        hasSolved = false;
-        break;
+    let finalColorCode = "";
+    for (const [index, character] of row.row.entries()) {
+      if (character === word[index]) {
+        finalColorCode += "C";
+        wordCharacterFrequency[getCharacterIndex(character)] -= 1;
+      } else if (wordCharacterFrequency[getCharacterIndex(character)] > 0) {
+        finalColorCode += "P";
+        wordCharacterFrequency[getCharacterIndex(character)] -= 1;
+      } else {
+        finalColorCode += "I";
       }
     }
 
-    // if entered word matches the game's word, player has won
-    // lock all the rows to prevent entering anything anymore
-    if (hasSolved) {
+    if (finalColorCode[columnIndex] === "C") {
+      return correctColor;
+    }
+
+    if (finalColorCode[columnIndex] === "I") {
+      return incorrectColor;
+    }
+
+    return partiallyCorrectColor;
+  }
+
+  function handleAfterSubmissionState() {
+    if (submittedWord === word) {
       winGame();
+      return;
     }
 
     // if not solved, lock the current row to avoid editing the previous attempts
@@ -136,8 +157,8 @@ export default function WordleLetterBox({
       return;
     }
 
-    // genuine submission, check if user won
-    decideWinOrLoss();
+    // handle what to do after submission
+    handleAfterSubmissionState();
   }
 
   return (
