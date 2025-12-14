@@ -22,7 +22,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           content: "width=device-width, initial-scale=1",
         },
         {
-          title: "TanStack Start Starter",
+          title: "JustWordle",
         },
       ],
       links: [
@@ -35,7 +35,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         },
         {
           rel: "stylesheet",
-          href: "https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap",
+          href: "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&display=swap",
         },
       ],
     }),

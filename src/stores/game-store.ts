@@ -1,11 +1,11 @@
 import { create } from "zustand";
 import { MAX_LETTERS, MAX_TRIES } from "~/lib/constants";
-import type { GridRow } from "~/types";
+import type { GameStatus, GridRow } from "~/types";
 
 type GameStoreState = {
   defaultGrid: GridRow[];
   grid: GridRow[];
-  gameStatus: number;
+  gameStatus: GameStatus;
 };
 
 type GameStoreAction = {
@@ -21,36 +21,40 @@ export const useGameStore = create<GameStoreState & GameStoreAction>((set) => ({
     row: new Array(MAX_LETTERS).fill(""),
     isSubmitted: false,
   })),
-  gameStatus: 0,
   grid: Array.from({ length: MAX_TRIES }, () => ({
     row: new Array(MAX_LETTERS).fill(""),
     isSubmitted: false,
   })),
+  gameStatus: "not_started",
   resetGrid: () => {
-    set((state) => ({ grid: state.defaultGrid, gameStatus: 0 }));
+    set((state) => ({ grid: state.defaultGrid, gameStatus: "not_started" }));
   },
-  updateGridCell: (pRow: number, pColumn: number, value: string) => {
+  updateGridCell: (
+    paramRowIndex: number,
+    paramColumnIndex: number,
+    newCellValue: string
+  ) => {
     set((state) => ({
       grid: state.grid.map((gridRow, rowIndex) => {
-        if (rowIndex !== pRow) {
+        if (rowIndex !== paramRowIndex) {
           return gridRow;
         }
         return {
           ...gridRow,
           row: gridRow.row.map((column, columnIndex) => {
-            if (columnIndex !== pColumn) {
+            if (columnIndex !== paramColumnIndex) {
               return column;
             }
-            return value;
+            return newCellValue;
           }),
         };
       }),
     }));
   },
-  lockGridRow: (pRow: number) =>
+  lockGridRow: (paramRowIndex: number) =>
     set((state) => ({
       grid: state.grid.map((gridRow, rowIndex) => {
-        if (rowIndex !== pRow) {
+        if (rowIndex !== paramRowIndex) {
           return gridRow;
         }
         return { ...gridRow, isSubmitted: true };
@@ -59,10 +63,10 @@ export const useGameStore = create<GameStoreState & GameStoreAction>((set) => ({
   winGame: () => {
     set((state) => ({
       grid: state.grid.map((gridRow) => ({ ...gridRow, isSubmitted: true })),
-      gameStatus: 1,
+      gameStatus: "won",
     }));
   },
   loseGame: () => {
-    set(() => ({ gameStatus: -1 }));
+    set(() => ({ gameStatus: "lost" }));
   },
 }));
