@@ -34,6 +34,7 @@ export default function WordleLetterBox({
     wordCharacterFrequency[getCharacterIndex(character)] += 1;
   }
 
+  const grid = useGameStore((store) => store.grid);
   const updateGridCell = useGameStore((store) => store.updateGridCell);
   const winGame = useGameStore((store) => store.winGame);
   const loseGame = useGameStore((store) => store.loseGame);
@@ -42,6 +43,10 @@ export default function WordleLetterBox({
   function handleCharacterChange(event: ChangeEvent<HTMLInputElement>) {
     // do nothing if the row is already submitted
     if (row.isSubmitted) {
+      return;
+    }
+
+    if (rowIndex > 0 && !grid[rowIndex - 1].isSubmitted) {
       return;
     }
 
@@ -74,6 +79,7 @@ export default function WordleLetterBox({
     return characterAsciiCode - 65;
   }
 
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <will fix later>
   function getBoxBackground() {
     const correctColor = "bg-emerald-200 dark:bg-emerald-600";
     const incorrectColor = "bg-neutral-300 dark:bg-neutral-600";
@@ -83,11 +89,16 @@ export default function WordleLetterBox({
       return "";
     }
 
+    for (const [index, character] of row.row.entries()) {
+      if (character === word[index]) {
+        wordCharacterFrequency[getCharacterIndex(character)] -= 1;
+      }
+    }
+
     let finalColorCode = "";
     for (const [index, character] of row.row.entries()) {
       if (character === word[index]) {
         finalColorCode += "C";
-        wordCharacterFrequency[getCharacterIndex(character)] -= 1;
       } else if (wordCharacterFrequency[getCharacterIndex(character)] > 0) {
         finalColorCode += "P";
         wordCharacterFrequency[getCharacterIndex(character)] -= 1;
@@ -165,8 +176,9 @@ export default function WordleLetterBox({
     <input
       className={cn(
         "flex size-10 items-center justify-center rounded border border-border text-center text-sm",
-        row.isSubmitted &&
-          "cursor-default caret-transparent focus:outline-none",
+        (row.isSubmitted ||
+          (rowIndex >= 1 && !grid[rowIndex - 1].isSubmitted)) &&
+          "cursor-not-allowed caret-transparent focus:outline-none",
         getBoxBackground()
       )}
       id={currentBoxId}
