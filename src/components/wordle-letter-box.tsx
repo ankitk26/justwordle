@@ -67,12 +67,12 @@ export default function WordleLetterBox({
       return "";
     }
     if (row.row[columnIndex] === word[columnIndex]) {
-      return "bg-emerald-200";
+      return "bg-emerald-200 dark:bg-emerald-600";
     }
     if (word.includes(row.row[columnIndex])) {
-      return "bg-amber-200";
+      return "bg-amber-200 dark:bg-amber-600";
     }
-    return "bg-neutral-300";
+    return "bg-neutral-300 dark:bg-neutral-600";
   }
 
   function decideWinOrLoss() {
