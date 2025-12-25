@@ -10,8 +10,7 @@ export function getRouter() {
     routeTree,
     context: { queryClient },
     defaultPreload: "intent",
-    // defaultErrorComponent: DefaultCatchBoundary,
-    // defaultNotFoundComponent: () => <NotFound />,
+    defaultNotFoundComponent: () => <div>Not Found</div>,
   });
   setupRouterSsrQueryIntegration({
     router,

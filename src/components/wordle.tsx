@@ -1,9 +1,23 @@
 /** biome-ignore-all lint/suspicious/noArrayIndexKey: <needed to grab any cell's value> */
+
+import type {
+  QueryObserverResult,
+  RefetchOptions,
+} from "@tanstack/react-query";
 import { useGameStore } from "~/stores/game-store";
 import { Button } from "./ui/button";
 import WordleLetterBox from "./wordle-letter-box";
 
-export default function Wordle({ word }: { word: string }) {
+export default function Wordle({
+  word,
+  refetch,
+}: {
+  word: string;
+  refetch: (
+    options?: RefetchOptions | undefined
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  ) => Promise<QueryObserverResult<any, Error>>;
+}) {
   const gameStatus = useGameStore((store) => store.gameStatus);
   const resetGrid = useGameStore((store) => store.resetGrid);
   const grid = useGameStore((store) => store.grid);
@@ -32,10 +46,15 @@ export default function Wordle({ word }: { word: string }) {
       ))}
 
       <div className="mt-8 flex flex-col items-center justify-center">
-        {gameStatus === "lost" && <p className="text-rose-500">You LOST!</p>}
-        {gameStatus === "won" && <p className="text-emerald-500">You WON!</p>}
+        {gameStatus === "lost" && (
+          <p className="text-rose-500">You LOST! {word}</p>
+        )}
+        {gameStatus === "won" && (
+          <p className="text-emerald-500">You WON! {word}</p>
+        )}
         <Button
           onClick={() => {
+            refetch();
             resetGrid();
           }}
         >
