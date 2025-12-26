@@ -10,10 +10,7 @@ export default function Game() {
 
   return (
     <section className="mt-16 flex w-full flex-1 flex-col items-center justify-center">
-      <div className="flex flex-col items-center space-y-4">
-        {/*<h1 className="font-semibold">{word}</h1>*/}
-        <Wordle refetch={refetch} word={word} />
-      </div>
+      <Wordle refetch={refetch} word={word} />
     </section>
   );
 }
