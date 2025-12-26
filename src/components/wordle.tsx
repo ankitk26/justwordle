@@ -15,7 +15,7 @@ export default function Wordle({
   word: string;
   refetch: (
     options?: RefetchOptions | undefined
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    // biome-ignore lint/suspicious/noExplicitAny: <allow any here>
   ) => Promise<QueryObserverResult<any, Error>>;
 }) {
   const gameStatus = useGameStore((store) => store.gameStatus);
